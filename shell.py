@@ -8,7 +8,12 @@ def remove_file(del_file):
           print(f"No such file or directory")
      
 def remove_directory(directory):
-     os.rmdir(directory)
+     try:
+          os.rmdir(directory)
+     except FileNotFoundError:
+          print(f"{directory}: No such file or directory")
+
+
 def create_directory(create_dir):
      try:
           os.makedirs(create_dir)
@@ -29,7 +34,10 @@ def cat_command(show_file):
           print(f"{i}: No such file or directory")
      except PermissionError:
           print(f"{i}: Permission denied")
-     
+
+def run_python_file(python_file):
+     liste = ["python3"] + python_file
+     os.execvp("python3",liste)     
 
 def main():
 
@@ -88,7 +96,8 @@ def main():
           elif cmd == "mkdir":
                if len(args) > 1:
                     create_directory(args[1])
-
+          elif cmd == "python3":
+               run_python_file(args[1:])
           else:
                print(f"{cmd}: command not found")
           
