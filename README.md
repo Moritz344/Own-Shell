@@ -1,3 +1,7 @@
+```
+$ 
+```
+
 # Custom Shell Script
 This Python script implements a basic shell environment that supports several common shell commands. It utilizes the os and sys modules to perform file and directory operations, and the termcolor module for colored terminal output.
 
