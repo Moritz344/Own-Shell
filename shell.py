@@ -1,24 +1,26 @@
 import os
-import sys 
+import sys
+from termcolor import cprint
+import time
 
 def remove_file(del_file):
      try:
           os.remove(del_file)
      except FileNotFoundError:
-          print(f"No such file or directory")
+          cprint(f"{del_file}: No such file or directory","red",attrs=["bold"])
      
 def remove_directory(directory):
      try:
           os.rmdir(directory)
      except FileNotFoundError:
-          print(f"{directory}: No such file or directory")
+          cprint(f"{directory}: No such file or directory","red",attrs=["bold"])
 
 
 def create_directory(create_dir):
      try:
           os.makedirs(create_dir)
      except OSError:
-          print("mkdir: cannot create directory ")
+          cprint("mkdir: cannot create directory ","red",attrs=["bold"])
      
 
 def cat_command(show_file):
@@ -31,13 +33,16 @@ def cat_command(show_file):
                     # zeige den inhalt
                     print(file.read())
      except FileNotFoundError:
-          print(f"{i}: No such file or directory")
+          cprint(f"{i}: No such file or directory","red",attrs=["bold"])
      except PermissionError:
-          print(f"{i}: Permission denied")
+          cprint(f"{i}: Permission denied",color="red",attrs=["bold"])
+     except OSError:
+          cprint(f"{i}: Invalid argument","red",attrs=["bold"])
 
 def run_python_file(python_file):
      liste = ["python3"] + python_file
-     os.execvp("python3",liste)     
+     os.execvp("python3",liste)
+     
 
 def main():
 
@@ -45,9 +50,12 @@ def main():
           sys.stdout.write("$ ")
           sys.stdout.flush()
 
-          args = input().split()
-          
-          cmd = args[0]
+          command = input()
+          args = command.split()
+          try:
+               cmd = args[0]
+          except IndexError:
+               continue
           
 
 
@@ -98,13 +106,17 @@ def main():
                     create_directory(args[1])
           elif cmd == "python3":
                run_python_file(args[1:])
+               time.sleep(1)
+          elif cmd == "whoami":
+               whoami = os.getlogin()
+               print(whoami)
+          elif cmd == "size-t":
+               terminal_size = os.get_terminal_size()
+               print(terminal_size)
+               
           else:
                print(f"{cmd}: command not found")
-          
-
-  
-
-
+     
 
 if __name__ == "__main__":
      main()    
