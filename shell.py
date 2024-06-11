@@ -1,19 +1,20 @@
 import os
 import sys
-from termcolor import cprint
+from termcolor import cprint,colored
 import time
+import subprocess
 
 def remove_file(del_file):
      try:
           os.remove(del_file)
      except FileNotFoundError:
-          cprint(f"{del_file}: No such file or directory","red",attrs=["bold"])
+          print(f"{del_file}: No such file or directory")
      
 def remove_directory(directory):
      try:
           os.rmdir(directory)
      except FileNotFoundError:
-          cprint(f"{directory}: No such file or directory","red",attrs=["bold"])
+          print(f"{directory}: No such file or directory")
 
 
 def create_directory(create_dir):
@@ -21,8 +22,6 @@ def create_directory(create_dir):
           os.makedirs(create_dir)
      except OSError:
           cprint("mkdir: cannot create directory ","red",attrs=["bold"])
-     
-
 def cat_command(show_file):
      files = show_file
      try:
@@ -31,25 +30,25 @@ def cat_command(show_file):
                # öffnen und lesen der datei
                with open(i,"r") as file:
                     # zeige den inhalt
-                    print(file.read())
+                    cprint(file.read(),"white")
      except FileNotFoundError:
-          cprint(f"{i}: No such file or directory","red",attrs=["bold"])
+          print(f"{i}: No such file or directory")
      except PermissionError:
-          cprint(f"{i}: Permission denied",color="red",attrs=["bold"])
+          print(f"{i}: Permission denied")
      except OSError:
-          cprint(f"{i}: Invalid argument","red",attrs=["bold"])
+          print(f"{i}: Invalid argument")
 
 def run_python_file(python_file):
      liste = ["python3"] + python_file
      os.execvp("python3",liste)
-     
+      
 
 def main():
-
      while True:
+          path = os.getcwd()
+          print(colored(path,"yellow"))
           sys.stdout.write("$ ")
           sys.stdout.flush()
-
           command = input()
           args = command.split()
           try:
@@ -64,6 +63,7 @@ def main():
           elif cmd == "pwd":
                pwd = os.getcwd()    
                print(pwd)
+               return pwd
           elif cmd == "type":
                if len(cmd) > 1:
                     for arg in args[1:]:
@@ -82,19 +82,32 @@ def main():
                          os.chdir(path)
                     except FileNotFoundError:
                          print(f"{args[1]}: No such file or directory")
-
-
-
+        
+          elif cmd == "file":
+                # subprocess-Moduls werden verwendet um einen externen Befehl in einem neuen Prozess auszuführen
+                # capture_output=True: Diese Option erfasst die Ausgabe (stdout und stderr) des ausgeführten Befehls.
+                # text=True: Diese Option sorgt dafür, dass die Ausgabe als String und nicht als Bytes zurückgegeben wird.
+                # check=True: Diese Option bewirkt, dass eine Ausnahme (subprocess.CalledProcessError) ausgelöst wird, wenn der Befehl                  mit einem nicht-null Rückgabewert (Fehler) beendet wird.
+                try:
+                    result = subprocess.run(['file', args[1]], capture_output=True, text=True, check=True)
+                    result = result.stdout.strip()
+                    print(result)
+                except IndexError:
+                    print("im here :c (IndexError)")
+    
           elif cmd == "ls":
                    nummer = 0
+                   nummer_farbe = "yellow"
+                   datei_farbe = "blue" 
                    for i in os.listdir():
                         nummer += 1
-                        print(nummer,i)
+                        print(colored(f"{nummer}",nummer_farbe),colored(i,datei_farbe))
+
           elif cmd == "cat":
                if len(args) > 1:
                     cat_command(args[1:])
           elif cmd == "clear":
-               os.system("cls")
+               os.system("clear")
           elif cmd == "rmdir":
                if len(args) > 1:
                     remove_directory(args[1])
@@ -107,16 +120,14 @@ def main():
           elif cmd == "python3":
                run_python_file(args[1:])
                time.sleep(1)
+               
           elif cmd == "whoami":
                whoami = os.getlogin()
                print(whoami)
-          elif cmd == "size-t":
-               terminal_size = os.get_terminal_size()
-               print(terminal_size)
                
           else:
                print(f"{cmd}: command not found")
      
 
 if __name__ == "__main__":
-     main()    
+     main() 
