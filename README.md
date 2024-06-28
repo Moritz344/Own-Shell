@@ -50,5 +50,5 @@ $ rm file1.txt
 $ python3 script.py
 
 $ whoami
-your-username
+Bob123
 ```
